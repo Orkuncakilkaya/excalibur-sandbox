@@ -6,7 +6,6 @@ import { Constants } from '../constants'
 import { Action } from '../types/events/actionEvents'
 import { GlobalEvents } from '../utils/globalEvents'
 import { MovementComponent } from '../components/movementComponent'
-import { Tree } from './tree'
 
 export class Cursor extends Actor {
   protected player: Player
@@ -40,12 +39,6 @@ export class Cursor extends Actor {
       this.collisions = this.collisions.filter((t) => t !== event.other)
     })
     this.bus.emitter.on('onAction', ({ action }) => {
-      if (action === Action.Drop && this.selectedTile) {
-        const chunk = this.world.findOrCreateChunk(globalPositionToChunkPosition(this.pos.x, this.pos.y))
-        const tree = new Tree()
-        tree.pos.setTo(this.selectedTile.x * Constants.TileSize + 8, this.selectedTile.y * Constants.TileSize + 8)
-        chunk.addChild(tree)
-      }
       if (action === Action.OnHoldAction) {
         if (this.collisions.length) {
           const target = this.collisions[0]
