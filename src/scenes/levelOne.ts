@@ -7,7 +7,6 @@ import { AnimationSystem } from '../systems/animationSystem'
 import { ExploringSystem } from '../systems/exploringSystem'
 import { PlayerControllerSystem } from '../systems/playerControllerSystem'
 import { GlobalEvents } from '../utils/globalEvents'
-import { Action } from '../types/events/actionEvents'
 
 /**
  * Managed scene

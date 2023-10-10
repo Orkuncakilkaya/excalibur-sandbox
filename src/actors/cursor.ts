@@ -1,5 +1,5 @@
 import { Player } from './player'
-import { Actor, Color, Engine, Rectangle, vec } from 'excalibur'
+import { Actor, Color, Engine, Rectangle, Tile, vec } from 'excalibur'
 import { directionToVector, globalPositionToChunkPosition } from '../utils/position'
 import { WorldManager } from '../world/worldManager'
 import { Constants } from '../constants'
@@ -13,6 +13,7 @@ export class Cursor extends Actor {
   protected world: WorldManager
   protected collisions: Actor[] = []
   protected bus: GlobalEvents = GlobalEvents.getInstance()
+  protected selectedTile: Tile
 
   constructor(player: Player) {
     super()
@@ -39,10 +40,10 @@ export class Cursor extends Actor {
       this.collisions = this.collisions.filter((t) => t !== event.other)
     })
     this.bus.emitter.on('onAction', ({ action }) => {
-      if (action === Action.Drop) {
+      if (action === Action.Drop && this.selectedTile) {
         const chunk = this.world.findOrCreateChunk(globalPositionToChunkPosition(this.pos.x, this.pos.y))
         const tree = new Tree()
-        tree.pos.setTo(this.pos.x, this.pos.y)
+        tree.pos.setTo(this.selectedTile.x * Constants.TileSize + 8, this.selectedTile.y * Constants.TileSize + 8)
         chunk.addChild(tree)
       }
       if (action === Action.Interact) {
@@ -73,6 +74,7 @@ export class Cursor extends Actor {
     const playerChunk = this.world.findOrCreateChunk(globalPositionToChunkPosition(playerTarget.x, playerTarget.y))
     const tile = playerChunk.getTileByPoint(playerTarget)
     if (tile) {
+      this.selectedTile = tile
       this.pos = tile.pos.clone().add(vec(Constants.TileSize / 2, Constants.TileSize / 2))
     } else {
       this.pos = playerTarget
