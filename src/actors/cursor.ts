@@ -46,7 +46,7 @@ export class Cursor extends Actor {
         tree.pos.setTo(this.selectedTile.x * Constants.TileSize + 8, this.selectedTile.y * Constants.TileSize + 8)
         chunk.addChild(tree)
       }
-      if (action === Action.Interact) {
+      if (action === Action.OnHoldAction) {
         if (this.collisions.length) {
           const target = this.collisions[0]
           if (target.hasTag('tree')) {

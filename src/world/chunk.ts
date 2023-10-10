@@ -2,6 +2,7 @@ import { Engine, PolygonCollider, SpriteSheet, TileMap, vec, Vector } from 'exca
 import { ChunkGenerator, ChunkWithPosition } from './chunkGenerator'
 import { Resources } from '../resources'
 import { Constants } from '../constants'
+import { Tree } from '../actors/tree'
 
 interface ChunkOptions {
   pos: Vector
@@ -64,6 +65,12 @@ export class Chunk extends TileMap implements ChunkWithPosition {
       }
       if (cell.hasTag('shore')) {
         cell.addGraphic(this.townSheet.getSprite(1, 2))
+      }
+      if (!this.isInitialized) {
+        if (cell.hasTag('tree')) {
+          const tree = new Tree(cell.pos.add(vec(8, 8)))
+          this.addChild(tree)
+        }
       }
     }
   }

@@ -23,7 +23,7 @@ export class Player extends Actor {
       }),
     )
     this.addComponent<ExplorerComponent>(new ExplorerComponent())
-    this.addComponent<MovementComponent>(new MovementComponent(300))
+    this.addComponent<MovementComponent>(new MovementComponent(150))
     this.addComponent<PlayerControllerComponent>(new PlayerControllerComponent())
     this.addComponent<AnimationComponent>(
       new AnimationComponent({

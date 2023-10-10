@@ -100,7 +100,17 @@ export class PlayerControllerSystem extends System {
             this.bus.emitter.emit('onAction', new ActionEvent(Action.Drop))
           }
           if (this.input.keyboard.wasPressed(Keys.E)) {
+            if (!component.keyHold[Keys.E]) {
+              component.keyHold[Keys.E] = {}
+            }
+            component.keyHold[Keys.E].start = Date.now()
             this.bus.emitter.emit('onAction', new ActionEvent(Action.Interact))
+          }
+          if (this.input.keyboard.wasReleased(Keys.E)) {
+            component.keyHold[Keys.E].end = Date.now()
+            if (component.keyHold[Keys.E].end - component.keyHold[Keys.E].start > 500) {
+              this.bus.emitter.emit('onAction', new ActionEvent(Action.OnHoldAction))
+            }
           }
         }
 

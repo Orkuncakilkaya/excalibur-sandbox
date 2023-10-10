@@ -11,10 +11,12 @@ export type Chunk = TileMap & ChunkWithPosition
 
 export class ChunkGenerator {
   private static instance: ChunkGenerator
-  private readonly generateNoise: NoiseFunction2D
+  private readonly terrainNoise: NoiseFunction2D
+  private readonly treeNoise: NoiseFunction2D
 
   constructor() {
-    this.generateNoise = createNoise2D(alea(0x00aaef12))
+    this.terrainNoise = createNoise2D(alea(0x00aaef12))
+    this.treeNoise = createNoise2D(alea(0x00aaef12))
   }
 
   public static getInstance(): ChunkGenerator {
@@ -25,16 +27,21 @@ export class ChunkGenerator {
     return ChunkGenerator.instance
   }
 
-  private setCellType(cell: Tile, noise: number) {
-    const max_water_level = 0
-    const max_sand_level = 0.6
-    const max_grass_level = 0.8
+  private setCellType(cell: Tile, terrainNoise: number, treeNoise: number) {
+    const maxWaterLevel = 0
+    const maxSandLevel = 0.6
+    const maxGrassLevel = 0.92
 
-    if (noise >= max_water_level && noise < max_sand_level) {
+    const treeLevelRange = [0.9, 1]
+
+    if (terrainNoise >= maxWaterLevel && terrainNoise < maxSandLevel) {
       cell.addTag('shore')
-    } else if (noise >= max_sand_level && noise < max_grass_level) {
+    } else if (terrainNoise >= maxSandLevel && terrainNoise < maxGrassLevel) {
+      if (treeNoise > treeLevelRange[0] && treeNoise < treeLevelRange[1]) {
+        cell.addTag('tree')
+      }
       cell.addTag('plain')
-    } else if (noise >= max_grass_level) {
+    } else if (terrainNoise >= maxGrassLevel) {
       cell.addTag('hill')
     } else {
       cell.addTag('water')
@@ -44,16 +51,18 @@ export class ChunkGenerator {
   public generateChunk(chunk: Chunk) {
     for (const cell of chunk.tiles) {
       const { x, y } = cell
-      const nX = (chunk.chunkPosition.x * Constants.ChunkSize + x) / 256
-      const nY = (chunk.chunkPosition.y * Constants.ChunkSize + y) / 256
-      const d = Math.min(1, (nX ** 2 + nY ** 2) / Math.sqrt(0.5))
-      let e =
-        this.generateNoise(nX, nY) +
-        0.5 * this.generateNoise(2 * nX, 2 * nY) +
-        0.25 * this.generateNoise(4 * nX, 4 * nY)
-      e = (e + (1 - d)) / 2
-      const noise = Math.pow(e, 0.2)
-      this.setCellType(cell, noise)
+      const terrainNoise = this.generateNoise(x, y, chunk, this.terrainNoise)
+      const treeNoise = this.treeNoise(x, y)
+      this.setCellType(cell, terrainNoise, treeNoise)
     }
+  }
+
+  protected generateNoise(x: number, y: number, chunk: Chunk, noise: NoiseFunction2D) {
+    const nX = (chunk.chunkPosition.x * Constants.ChunkSize + x) / 256
+    const nY = (chunk.chunkPosition.y * Constants.ChunkSize + y) / 256
+    const d = Math.min(1, (nX ** 2 + nY ** 2) / Math.sqrt(0.5))
+    let e = noise(nX, nY) + 0.5 * noise(2 * nX, 2 * nY) + 0.25 * noise(4 * nX, 4 * nY)
+    e = (e + (1 - d)) / 2
+    return Math.pow(e, 0.2)
   }
 }
