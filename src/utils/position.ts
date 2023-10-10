@@ -1,4 +1,4 @@
-import { vec } from 'excalibur'
+import { vec, Vector } from 'excalibur'
 import { Constants } from '../constants'
 
 export const globalPositionToChunkPosition = (globalX: number, globalY: number) => {
@@ -43,6 +43,34 @@ export const directionToVector = (direction: LookDirection) => {
     case LookDirection.West:
       return vec(-1, 0)
   }
+}
+
+export const vectorToDirection = (vector: Vector) => {
+  if (vec(0, -1).distance(vector) === 0) {
+    return LookDirection.North
+  }
+  if (vec(1, 0).distance(vector) === 0) {
+    return LookDirection.East
+  }
+  if (vec(-1, 0).distance(vector) === 0) {
+    return LookDirection.West
+  }
+  if (vec(0, 1).distance(vector) === 0) {
+    return LookDirection.South
+  }
+  if (vec(1, 1).distance(vector) === 0) {
+    return LookDirection.SouthEast
+  }
+  if (vec(-1, -1).distance(vector) === 0) {
+    return LookDirection.SouthWest
+  }
+  if (vec(-1, -1).distance(vector) === 0) {
+    return LookDirection.NorthWest
+  }
+  if (vec(1, -1).distance(vector) === 0) {
+    return LookDirection.NorthEast
+  }
+  return LookDirection.South
 }
 
 export const compassToDirection = (compass: number): LookDirection => {

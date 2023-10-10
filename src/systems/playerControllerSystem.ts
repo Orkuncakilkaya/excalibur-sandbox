@@ -22,7 +22,7 @@ import { Action, ActionEvent } from '../types/events/actionEvents'
 import { PlayerControllerComponent } from '../components/playerControllerComponent'
 import { MovementComponent } from '../components/movementComponent'
 import { Constants } from '../constants'
-import { globalPositionToChunkPosition } from '../utils/position'
+import { globalPositionToChunkPosition, vectorToDirection } from '../utils/position'
 import { WorldManager } from '../world/worldManager'
 
 export class PlayerControllerSystem extends System {
@@ -102,9 +102,6 @@ export class PlayerControllerSystem extends System {
           if (this.input.keyboard.wasPressed(Keys.E)) {
             this.bus.emitter.emit('onAction', new ActionEvent(Action.Interact))
           }
-          if (this.input.keyboard.wasPressed(Keys.R)) {
-            this.bus.emitter.emit('onAction', new ActionEvent(Action.SaveWorld))
-          }
         }
 
         if (queue.isComplete() && velocity.distance(vec(0, 0)) > 0) {
@@ -132,6 +129,10 @@ export class PlayerControllerSystem extends System {
           }
           if (tileIsFree) {
             actions.moveBy(vec(velocity.x * Constants.TileSize, velocity.y * Constants.TileSize), movement.speed)
+          } else {
+            const dir = vectorToDirection(velocity)
+            movement.oldDirection = dir
+            movement.direction = dir
           }
         }
       }

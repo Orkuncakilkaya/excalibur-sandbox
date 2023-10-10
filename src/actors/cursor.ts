@@ -3,10 +3,10 @@ import { Actor, Color, Engine, Rectangle, vec } from 'excalibur'
 import { directionToVector, globalPositionToChunkPosition } from '../utils/position'
 import { WorldManager } from '../world/worldManager'
 import { Constants } from '../constants'
-import { PointActor } from './pointActor'
 import { Action } from '../types/events/actionEvents'
 import { GlobalEvents } from '../utils/globalEvents'
 import { MovementComponent } from '../components/movementComponent'
+import { Tree } from './tree'
 
 export class Cursor extends Actor {
   protected player: Player
@@ -40,8 +40,10 @@ export class Cursor extends Actor {
     })
     this.bus.emitter.on('onAction', ({ action }) => {
       if (action === Action.Drop) {
-        const circle = new PointActor(this.pos)
-        this.scene.add(circle)
+        const chunk = this.world.findOrCreateChunk(globalPositionToChunkPosition(this.pos.x, this.pos.y))
+        const tree = new Tree()
+        tree.pos.setTo(this.pos.x, this.pos.y)
+        chunk.addChild(tree)
       }
       if (action === Action.Interact) {
         if (this.collisions.length) {

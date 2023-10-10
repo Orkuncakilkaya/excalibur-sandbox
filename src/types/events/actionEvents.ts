@@ -3,7 +3,6 @@ export enum Action {
   Attack,
   Block,
   Drop,
-  SaveWorld,
 }
 
 export class ActionEvent {
