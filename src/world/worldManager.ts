@@ -1,5 +1,5 @@
 import { Chunk } from './chunk'
-import { Scene, vec, Vector } from 'excalibur'
+import { GraphicsComponent, Scene, vec, Vector } from 'excalibur'
 import { Constants } from '../constants'
 
 export class WorldManager {
@@ -26,11 +26,10 @@ export class WorldManager {
       pos: position,
     })
     chunk.pos = vec(
-      Constants.ChunkSize * Constants.SpriteSize * position.x,
-      Constants.ChunkSize * Constants.SpriteSize * position.y,
+      Constants.ChunkSize * Constants.TileSize * position.x,
+      Constants.ChunkSize * Constants.TileSize * position.y,
     )
-    this.addChunk(chunk)
-    return chunk
+    return this.addChunk(chunk)
   }
 
   protected addChunk(chunk: Chunk) {
@@ -40,41 +39,28 @@ export class WorldManager {
   }
 
   public findOrCreateChunk(vector: Vector) {
-    let target = this.chunks.find((t) => t.chunkPosition.x === vector.x && t.chunkPosition.y === vector.y)
-    if (!target) {
-      target = this.createChunk(vector)
-    }
+    const target = this.chunks.find((t) => t.chunkPosition.x === vector.x && t.chunkPosition.y === vector.y)
 
-    return target
+    return target ?? this.createChunk(vector)
   }
 
   public setChunkVisible(vector: Vector) {
-    this.hideAllChunks()
-
+    this.chunks.forEach((chunk) => {
+      const graphics = chunk.get<GraphicsComponent>(GraphicsComponent)
+      graphics.visible = false
+    })
     const target = this.findOrCreateChunk(vector)
-    const visibleChunks = this.getChunkNeighbours(target.chunkPosition).map((neighbour) => {
+    const vectors = this.getChunkNeighbours(target.chunkPosition).map((neighbour) => {
       this.findOrCreateChunk(neighbour)
       return neighbour
     })
-    visibleChunks.push(vector)
-
-    this.makeChunksVisible(visibleChunks)
-  }
-
-  protected hideAllChunks() {
-    this.chunks.forEach((chunk) => {
-      chunk.active = false
-      return chunk
-    })
-  }
-
-  protected makeChunksVisible(vectorList: Vector[]) {
-    for (const vector of vectorList) {
+    vectors.push(vector)
+    for (const vect of vectors) {
       this.chunks.forEach((chunk) => {
-        if (Vector.distance(vector, chunk.chunkPosition)) {
-          chunk.active = true
+        if (chunk.chunkPosition.x === vect.x && chunk.chunkPosition.y === vect.y) {
+          const graphics = chunk.get<GraphicsComponent>(GraphicsComponent)
+          graphics.visible = true
         }
-        return chunk
       })
     }
   }

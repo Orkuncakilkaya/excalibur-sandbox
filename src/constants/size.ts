@@ -1,2 +1,3 @@
-export const SpriteSize = 64
-export const ChunkSize = 64
+export const TileSize = 16
+export const SpriteSize = 32
+export const ChunkSize = 32

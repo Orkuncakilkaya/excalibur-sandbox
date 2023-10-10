@@ -3,8 +3,8 @@ import { Constants } from '../constants'
 
 export const globalPositionToChunkPosition = (globalX: number, globalY: number) => {
   return vec(
-    Math.floor(globalX / (Constants.ChunkSize * Constants.SpriteSize)),
-    Math.floor(globalY / (Constants.ChunkSize * Constants.SpriteSize)),
+    Math.floor(globalX / (Constants.ChunkSize * Constants.TileSize)),
+    Math.floor(globalY / (Constants.ChunkSize * Constants.TileSize)),
   )
 }
 

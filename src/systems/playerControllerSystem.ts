@@ -1,7 +1,9 @@
 import {
   ActionsComponent,
   Axes,
+  BoundingBox,
   Buttons,
+  ColliderComponent,
   Component,
   EngineInput,
   Entity,
@@ -11,6 +13,7 @@ import {
   System,
   SystemType,
   SystemTypes,
+  TransformComponent,
   vec,
   Vector,
 } from 'excalibur'
@@ -19,6 +22,8 @@ import { Action, ActionEvent } from '../types/events/actionEvents'
 import { PlayerControllerComponent } from '../components/playerControllerComponent'
 import { MovementComponent } from '../components/movementComponent'
 import { Constants } from '../constants'
+import { globalPositionToChunkPosition } from '../utils/position'
+import { WorldManager } from '../world/worldManager'
 
 export class PlayerControllerSystem extends System {
   readonly systemType: SystemType = SystemType.Update
@@ -33,17 +38,18 @@ export class PlayerControllerSystem extends System {
   }
 
   update(entities: Entity[]): void {
+    const world = WorldManager.getInstance()
     for (const entity of entities) {
       const component = entity.get<PlayerControllerComponent>(PlayerControllerComponent)
       const actions = entity.get<ActionsComponent>(ActionsComponent)
       const movement = entity.get<MovementComponent>(MovementComponent)
+      const transform = entity.get<TransformComponent>(TransformComponent)
 
       let velocity: Vector = vec(0, 0)
 
-      if (component && actions && movement && actions) {
+      if (component && actions && movement && actions && transform) {
         const queue = actions.getQueue()
         if (this.gamePad) {
-          const queue = actions.getQueue()
           let x = this.gamePad.getAxes(Axes.LeftStickX)
           let y = this.gamePad.getAxes(Axes.LeftStickY)
           if (Math.abs(x) < component.gamepadDeadZone) {
@@ -69,9 +75,6 @@ export class PlayerControllerSystem extends System {
           }
 
           velocity = vec(nX, nY)
-          if (queue.isComplete()) {
-            actions.moveBy(vec(velocity.x * Constants.SpriteSize, velocity.y * Constants.SpriteSize), movement.speed)
-          }
           if (this.gamePad.wasButtonPressed(Buttons.Face2)) {
             this.bus.emitter.emit('onAction', new ActionEvent(Action.Drop))
           }
@@ -93,9 +96,6 @@ export class PlayerControllerSystem extends System {
           if (this.input.keyboard.isHeld(Keys.D)) {
             velocity.x = 1
           }
-          if (queue.isComplete()) {
-            actions.moveBy(vec(velocity.x * Constants.SpriteSize, velocity.y * Constants.SpriteSize), movement.speed)
-          }
           if (this.input.keyboard.wasPressed(Keys.Q)) {
             this.bus.emitter.emit('onAction', new ActionEvent(Action.Drop))
           }
@@ -104,6 +104,34 @@ export class PlayerControllerSystem extends System {
           }
           if (this.input.keyboard.wasPressed(Keys.R)) {
             this.bus.emitter.emit('onAction', new ActionEvent(Action.SaveWorld))
+          }
+        }
+
+        if (queue.isComplete() && velocity.distance(vec(0, 0)) > 0) {
+          let tileIsFree = true
+          const nextPosition = vec(
+            transform.pos.x + velocity.x * Constants.TileSize,
+            transform.pos.y + velocity.y * Constants.TileSize,
+          )
+          const nextBounding = new BoundingBox({
+            top: nextPosition.y,
+            left: nextPosition.x,
+            right: nextPosition.x + Constants.TileSize,
+            bottom: nextPosition.y + Constants.TileSize,
+          })
+          const nextChunkPosition = globalPositionToChunkPosition(nextPosition.x, nextPosition.y)
+          const chunk = world.findOrCreateChunk(nextChunkPosition)
+          for (const child of chunk.children) {
+            if (child.hasTag('solid')) {
+              const collider = child.get<ColliderComponent>(ColliderComponent)
+              if (collider.bounds.overlaps(nextBounding)) {
+                tileIsFree = false
+                break
+              }
+            }
+          }
+          if (tileIsFree) {
+            actions.moveBy(vec(velocity.x * Constants.TileSize, velocity.y * Constants.TileSize), movement.speed)
           }
         }
       }

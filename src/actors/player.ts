@@ -13,13 +13,13 @@ export class Player extends Actor {
     super.onInitialize(_engine)
     this.addTag('player')
     this.z = 10
-    this.pos = vec(32, 32)
+    this.pos = vec(8, 8)
     this.addComponent<SpriteComponent>(
       new SpriteComponent({
-        spriteSource: Resources.BodyMale,
+        spriteSource: Resources.prototype,
         spriteSize: Constants.SpriteSize,
-        spriteRow: 4,
-        spriteCol: 9,
+        spriteRow: 12,
+        spriteCol: 4,
       }),
     )
     this.addComponent<ExplorerComponent>(new ExplorerComponent())
@@ -28,24 +28,24 @@ export class Player extends Actor {
     this.addComponent<AnimationComponent>(
       new AnimationComponent({
         walkingAnimations: {
-          [LookDirection.West]: this.createBodyAnimation(range(9, 17)),
-          [LookDirection.SouthWest]: this.createBodyAnimation(range(9, 17)),
-          [LookDirection.NorthWest]: this.createBodyAnimation(range(9, 17)),
-          [LookDirection.East]: this.createBodyAnimation(range(27, 35)),
-          [LookDirection.SouthEast]: this.createBodyAnimation(range(27, 35)),
-          [LookDirection.NorthEast]: this.createBodyAnimation(range(27, 35)),
-          [LookDirection.North]: this.createBodyAnimation(range(0, 8)),
-          [LookDirection.South]: this.createBodyAnimation(range(18, 26)),
+          [LookDirection.West]: this.createBodyAnimation(range(16, 19)),
+          [LookDirection.SouthWest]: this.createBodyAnimation(range(16, 19)),
+          [LookDirection.NorthWest]: this.createBodyAnimation(range(16, 19)),
+          [LookDirection.East]: this.createBodyAnimation(range(16, 19)),
+          [LookDirection.SouthEast]: this.createBodyAnimation(range(16, 19)),
+          [LookDirection.NorthEast]: this.createBodyAnimation(range(16, 19)),
+          [LookDirection.North]: this.createBodyAnimation(range(20, 23)),
+          [LookDirection.South]: this.createBodyAnimation(range(12, 15)),
         },
         idleAnimations: {
-          [LookDirection.West]: this.createBodyAnimation([9]),
-          [LookDirection.SouthWest]: this.createBodyAnimation([9]),
-          [LookDirection.NorthWest]: this.createBodyAnimation([9]),
-          [LookDirection.East]: this.createBodyAnimation([27]),
-          [LookDirection.SouthEast]: this.createBodyAnimation([27]),
-          [LookDirection.NorthEast]: this.createBodyAnimation([27]),
-          [LookDirection.North]: this.createBodyAnimation([0]),
-          [LookDirection.South]: this.createBodyAnimation([18]),
+          [LookDirection.West]: this.createBodyAnimation(range(4, 7)),
+          [LookDirection.SouthWest]: this.createBodyAnimation(range(4, 7)),
+          [LookDirection.NorthWest]: this.createBodyAnimation(range(4, 7)),
+          [LookDirection.East]: this.createBodyAnimation(range(4, 7)),
+          [LookDirection.SouthEast]: this.createBodyAnimation(range(4, 7)),
+          [LookDirection.NorthEast]: this.createBodyAnimation(range(4, 7)),
+          [LookDirection.North]: this.createBodyAnimation(range(8, 11)),
+          [LookDirection.South]: this.createBodyAnimation(range(0, 3)),
         },
       }),
     )

@@ -1,6 +1,6 @@
 import { Component, Entity, GraphicsComponent, System, SystemType, SystemTypes } from 'excalibur'
 import { AnimationComponent } from '../components/animationComponent'
-import { MovementType } from '../utils/position'
+import { LookDirection, MovementType } from '../utils/position'
 import { MovementComponent } from '../components/movementComponent'
 
 export class AnimationSystem extends System {
@@ -20,6 +20,10 @@ export class AnimationSystem extends System {
         if (movement.movement === MovementType.Moving) {
           graphics.use(component.walkingAnimations[movement.direction])
         }
+        graphics.flipHorizontal = !(
+          movement.direction in
+          [LookDirection.West, LookDirection.SouthWest, LookDirection.NorthWest, LookDirection.NorthEast]
+        )
       }
     }
   }

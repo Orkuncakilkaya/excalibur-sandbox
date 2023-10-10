@@ -9,13 +9,22 @@ interface ChunkOptions {
 
 export class Chunk extends TileMap implements ChunkWithPosition {
   public readonly chunkPosition: Vector
-  private readonly sheet: SpriteSheet = SpriteSheet.fromImageSource({
-    image: Resources.Terrain,
+  private readonly battleSheet: SpriteSheet = SpriteSheet.fromImageSource({
+    image: Resources.tinyBattle,
     grid: {
-      spriteWidth: Constants.SpriteSize,
-      spriteHeight: Constants.SpriteSize,
+      spriteWidth: Constants.TileSize,
+      spriteHeight: Constants.TileSize,
+      rows: 11,
+      columns: 19,
+    },
+  })
+  private readonly townSheet: SpriteSheet = SpriteSheet.fromImageSource({
+    image: Resources.tinyTown,
+    grid: {
+      spriteWidth: Constants.TileSize,
+      spriteHeight: Constants.TileSize,
       rows: 12,
-      columns: 17,
+      columns: 11,
     },
   })
 
@@ -23,8 +32,8 @@ export class Chunk extends TileMap implements ChunkWithPosition {
     super({
       columns: Constants.ChunkSize,
       rows: Constants.ChunkSize,
-      tileHeight: Constants.SpriteSize,
-      tileWidth: Constants.SpriteSize,
+      tileHeight: Constants.TileSize,
+      tileWidth: Constants.TileSize,
     })
     this.chunkPosition = options.pos
   }
@@ -38,23 +47,23 @@ export class Chunk extends TileMap implements ChunkWithPosition {
         new PolygonCollider({
           points: [
             vec(0, 0),
-            vec(Constants.SpriteSize, 0),
-            vec(Constants.SpriteSize, -Constants.SpriteSize),
-            vec(0, -Constants.SpriteSize),
+            vec(Constants.TileSize, 0),
+            vec(Constants.TileSize, -Constants.TileSize),
+            vec(0, -Constants.TileSize),
           ],
         }),
       )
       if (cell.hasTag('water')) {
-        cell.addGraphic(this.sheet.getSprite(16, 11))
+        cell.addGraphic(this.battleSheet.getSprite(1, 2))
       }
       if (cell.hasTag('hill')) {
-        cell.addGraphic(this.sheet.getSprite(11, 1))
+        cell.addGraphic(this.townSheet.getSprite(1, 11))
       }
       if (cell.hasTag('plain')) {
-        cell.addGraphic(this.sheet.getSprite(6, 1))
+        cell.addGraphic(this.townSheet.getSprite(0, 0))
       }
       if (cell.hasTag('shore')) {
-        cell.addGraphic(this.sheet.getSprite(1, 1))
+        cell.addGraphic(this.townSheet.getSprite(1, 2))
       }
     }
   }

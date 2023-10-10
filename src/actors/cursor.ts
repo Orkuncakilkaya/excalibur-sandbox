@@ -24,12 +24,12 @@ export class Cursor extends Actor {
     super.onInitialize(_engine)
     this.z = 10
     const rect = new Rectangle({
-      width: Constants.SpriteSize,
-      height: Constants.SpriteSize,
+      width: Constants.TileSize,
+      height: Constants.TileSize,
       color: Color.fromHex('#ffffff55'),
     })
     this.graphics.use(rect)
-    this.collider.useBoxCollider(Constants.SpriteSize, Constants.SpriteSize)
+    this.collider.useBoxCollider(Constants.TileSize, Constants.TileSize)
     this.on('collisionstart', (event) => {
       if (!event.other.hasTag('player')) {
         this.collisions.push(event.other)
@@ -45,7 +45,11 @@ export class Cursor extends Actor {
       }
       if (action === Action.Interact) {
         if (this.collisions.length) {
-          this.collisions[0].kill()
+          const target = this.collisions[0]
+          if (target.hasTag('tree')) {
+            target.kill()
+            console.log('tree collected')
+          }
         }
       }
     })
@@ -60,14 +64,14 @@ export class Cursor extends Actor {
     const playerDirection = movement.direction
     const playerDirectionVector = directionToVector(playerDirection)
     playerDirectionVector.setTo(
-      playerDirectionVector.x * Constants.SpriteSize,
-      playerDirectionVector.y * Constants.SpriteSize,
+      playerDirectionVector.x * Constants.TileSize,
+      playerDirectionVector.y * Constants.TileSize,
     )
     const playerTarget = playerDirectionVector.clone().add(playerPos)
     const playerChunk = this.world.findOrCreateChunk(globalPositionToChunkPosition(playerTarget.x, playerTarget.y))
     const tile = playerChunk.getTileByPoint(playerTarget)
     if (tile) {
-      this.pos = tile.pos.clone().add(vec(Constants.SpriteSize / 2, Constants.SpriteSize / 2))
+      this.pos = tile.pos.clone().add(vec(Constants.TileSize / 2, Constants.TileSize / 2))
     } else {
       this.pos = playerTarget
     }
