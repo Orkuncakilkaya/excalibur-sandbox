@@ -9,6 +9,7 @@ import {
   Entity,
   Gamepad,
   Keys,
+  PointerButton,
   Scene,
   System,
   SystemType,
@@ -96,6 +97,18 @@ export class PlayerControllerSystem extends System {
           if (this.input.keyboard.isHeld(Keys.D)) {
             velocity.x = 1
           }
+          if (this.input.keyboard.wasPressed(Keys.Up)) {
+            this.bus.emitter.emit('onAction', new ActionEvent(Action.ChangeOffset, { offsetDirection: Vector.Up }))
+          }
+          if (this.input.keyboard.wasPressed(Keys.Right)) {
+            this.bus.emitter.emit('onAction', new ActionEvent(Action.ChangeOffset, { offsetDirection: Vector.Right }))
+          }
+          if (this.input.keyboard.wasPressed(Keys.Left)) {
+            this.bus.emitter.emit('onAction', new ActionEvent(Action.ChangeOffset, { offsetDirection: Vector.Left }))
+          }
+          if (this.input.keyboard.wasPressed(Keys.Down)) {
+            this.bus.emitter.emit('onAction', new ActionEvent(Action.ChangeOffset, { offsetDirection: Vector.Down }))
+          }
           if (this.input.keyboard.wasPressed(Keys.Q)) {
             this.bus.emitter.emit('onAction', new ActionEvent(Action.Drop))
           }
@@ -111,6 +124,13 @@ export class PlayerControllerSystem extends System {
             if (component.keyHold[Keys.E].end - component.keyHold[Keys.E].start > 500) {
               this.bus.emitter.emit('onAction', new ActionEvent(Action.OnHoldAction))
             }
+          }
+          const mouseWorldPosition = this.input.pointers.currentFramePointerCoords.get(0)?.worldPos
+          if (mouseWorldPosition && this.input.pointers.isDown(0)) {
+            this.bus.emitter.emit(
+              'onAction',
+              new ActionEvent(Action.ReplaceOffset, { offsetDirection: mouseWorldPosition }),
+            )
           }
         }
 

@@ -13,6 +13,11 @@ export class Cursor extends Actor {
   protected collisions: Actor[] = []
   protected bus: GlobalEvents = GlobalEvents.getInstance()
   protected selectedTile: Tile
+  protected maxOffset = vec(3, 3)
+  protected minOffset = vec(-3, -3)
+  protected offset = vec(0, 0)
+  protected mouseOffset = vec(0, 0)
+  protected mouseDistance = 5
 
   constructor(player: Player) {
     super()
@@ -49,6 +54,23 @@ export class Cursor extends Actor {
         }
       }
     })
+    this.bus.emitter.on('onAction', ({ action, options }) => {
+      if (action === Action.ChangeOffset && options.offsetDirection) {
+        const newOffset = this.offset.clone().add(options.offsetDirection)
+        if (
+          newOffset.x <= this.maxOffset.x &&
+          newOffset.x >= this.minOffset.x &&
+          newOffset.y <= this.maxOffset.y &&
+          newOffset.y >= this.minOffset.y
+        ) {
+          this.offset = newOffset
+          this.mouseOffset = vec(0, 0)
+        }
+      }
+      if (action === Action.ReplaceOffset && options.offsetDirection) {
+        this.mouseOffset = vec(options.offsetDirection.x, options.offsetDirection.y)
+      }
+    })
   }
 
   onPostUpdate(_engine: Engine, _delta: number) {
@@ -68,7 +90,23 @@ export class Cursor extends Actor {
     const tile = playerChunk.getTileByPoint(playerTarget)
     if (tile) {
       this.selectedTile = tile
-      this.pos = tile.pos.clone().add(vec(Constants.TileSize / 2, Constants.TileSize / 2))
+      this.pos = tile.pos
+        .clone()
+        .add(vec(Constants.TileSize / 2, Constants.TileSize / 2))
+        .add(vec(this.offset.x * Constants.TileSize, this.offset.y * Constants.TileSize))
+      if (this.mouseOffset.x !== 0 && this.mouseOffset.y !== 0) {
+        const chunkPosition = globalPositionToChunkPosition(this.mouseOffset.x, this.mouseOffset.y)
+        const targetChunk = this.world.findOrCreateChunk(chunkPosition)
+        const mouseTargetTile = targetChunk.getTileByPoint(this.mouseOffset)
+        if (mouseTargetTile) {
+          const targetPos = vec(mouseTargetTile.pos.x, mouseTargetTile.pos.y).add(
+            vec(Constants.TileSize / 2, Constants.TileSize / 2),
+          )
+          if (Math.abs(targetPos.distance(this.player.pos)) <= this.mouseDistance * Constants.TileSize) {
+            this.pos = targetPos
+          }
+        }
+      }
     } else {
       this.pos = playerTarget
     }
