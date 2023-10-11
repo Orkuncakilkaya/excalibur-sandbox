@@ -94,21 +94,26 @@ export class Cursor extends Actor {
         .clone()
         .add(vec(Constants.TileSize / 2, Constants.TileSize / 2))
         .add(vec(this.offset.x * Constants.TileSize, this.offset.y * Constants.TileSize))
-      if (this.mouseOffset.x !== 0 && this.mouseOffset.y !== 0) {
-        const chunkPosition = globalPositionToChunkPosition(this.mouseOffset.x, this.mouseOffset.y)
-        const targetChunk = this.world.findOrCreateChunk(chunkPosition)
-        const mouseTargetTile = targetChunk.getTileByPoint(this.mouseOffset)
-        if (mouseTargetTile) {
-          const targetPos = vec(mouseTargetTile.pos.x, mouseTargetTile.pos.y).add(
-            vec(Constants.TileSize / 2, Constants.TileSize / 2),
-          )
-          if (Math.abs(targetPos.distance(this.player.pos)) <= this.mouseDistance * Constants.TileSize) {
-            this.pos = targetPos
-          }
-        }
-      }
     } else {
       this.pos = playerTarget
+    }
+
+    if (this.mouseOffset.x !== 0 && this.mouseOffset.y !== 0) {
+      const chunkPosition = globalPositionToChunkPosition(this.mouseOffset.x, this.mouseOffset.y)
+      const targetChunk = this.world.findOrCreateChunk(chunkPosition)
+      const mouseTargetTile = targetChunk.getTileByPoint(this.mouseOffset)
+      if (mouseTargetTile) {
+        const targetPos = vec(mouseTargetTile.pos.x, mouseTargetTile.pos.y).add(
+          vec(Constants.TileSize / 2, Constants.TileSize / 2),
+        )
+        if (Math.abs(targetPos.distance(this.player.pos)) <= this.mouseDistance * Constants.TileSize) {
+          this.pos = targetPos
+        } else {
+          this.mouseOffset = vec(0, 0)
+        }
+      } else {
+        this.mouseOffset = vec(0, 0)
+      }
     }
   }
 }
