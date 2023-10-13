@@ -119,10 +119,13 @@ export class PlayerControllerSystem extends System {
             component.keyHold[Keys.E].start = Date.now()
             this.bus.emitter.emit('onAction', new ActionEvent(Action.Interact))
           }
-          if (this.input.keyboard.wasReleased(Keys.E)) {
-            component.keyHold[Keys.E].end = Date.now()
-            if (component.keyHold[Keys.E].end - component.keyHold[Keys.E].start > 500) {
-              this.bus.emitter.emit('onAction', new ActionEvent(Action.OnHoldAction))
+          if (this.input.keyboard.isHeld(Keys.E)) {
+            if (component.keyHold[Keys.E].start !== 0) {
+              const now = Date.now()
+              if (now - component.keyHold[Keys.E].start > 500) {
+                component.keyHold[Keys.E].start = 0
+                this.bus.emitter.emit('onAction', new ActionEvent(Action.OnHoldAction))
+              }
             }
           }
           const mouseWorldPosition = this.input.pointers.currentFramePointerCoords.get(0)?.worldPos
