@@ -1,6 +1,7 @@
-import { Engine, Loader, DisplayMode } from 'excalibur'
+import { Engine, DisplayMode } from 'excalibur'
 import { LevelOne } from './scenes/levelOne'
 import { Resources } from './resources'
+import { Loader } from './loader'
 
 /**
  * Managed game class
@@ -14,6 +15,8 @@ class Game extends Engine {
       viewport: { width: 1920, height: 1080 },
       resolution: { width: 3000, height: 3000 },
       suppressHiDPIScaling: true,
+      suppressPlayButton: true,
+      suppressConsoleBootMessage: true,
     })
   }
 
