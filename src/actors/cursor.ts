@@ -27,7 +27,7 @@ export class Cursor extends Actor {
 
   onInitialize(_engine: Engine) {
     super.onInitialize(_engine)
-    this.z = 10
+    this.z = 100
     const rect = new Rectangle({
       width: Constants.TileSize,
       height: Constants.TileSize,

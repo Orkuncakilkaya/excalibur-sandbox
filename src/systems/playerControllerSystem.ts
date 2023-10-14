@@ -146,8 +146,8 @@ export class PlayerControllerSystem extends System {
           const nextBounding = new BoundingBox({
             top: nextPosition.y,
             left: nextPosition.x,
-            right: nextPosition.x + Constants.TileSize,
-            bottom: nextPosition.y + Constants.TileSize,
+            right: nextPosition.x + Constants.TileSize - 8,
+            bottom: nextPosition.y + Constants.TileSize - 8,
           })
           const nextChunkPosition = globalPositionToChunkPosition(nextPosition.x, nextPosition.y)
           const chunk = world.findOrCreateChunk(nextChunkPosition)

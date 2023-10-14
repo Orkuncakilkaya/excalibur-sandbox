@@ -65,7 +65,7 @@ export class Chunk extends TileMap implements ChunkWithPosition {
         )
       }
       if (cell.hasTag('tree')) {
-        const tree = new Tree(cell.pos.add(vec(8, 8)))
+        const tree = new Tree(cell.pos.add(vec(-8, 0)))
         this.addChild(tree)
       }
     }
