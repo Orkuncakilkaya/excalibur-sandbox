@@ -1,4 +1,4 @@
-import { Actor, Animation, Engine, range, vec } from 'excalibur'
+import { Actor, Animation, Engine, range, Ray, vec, Vector } from 'excalibur'
 import { ExplorerComponent } from '../components/explorerComponent'
 import { MovementComponent } from '../components/movementComponent'
 import { PlayerControllerComponent } from '../components/playerControllerComponent'
@@ -9,6 +9,7 @@ import { Resources } from '../resources'
 import { Constants } from '../constants'
 
 export class Player extends Actor {
+  protected toBeOpaque: Actor[] = []
   onInitialize(_engine: Engine) {
     super.onInitialize(_engine)
     this.addTag('player')
@@ -54,5 +55,26 @@ export class Player extends Actor {
   protected createBodyAnimation(frameIndices: number[]) {
     const sprite = this.get<SpriteComponent>(SpriteComponent)
     return Animation.fromSpriteSheet(sprite.sheet, frameIndices, 100)
+  }
+
+  onPostUpdate(_engine: Engine, _delta: number) {
+    super.onPostUpdate(_engine, _delta)
+    const ray = new Ray(vec(this.pos.x, this.pos.y), Vector.Zero)
+    const hits = _engine.currentScene.physics.rayCast(ray, {
+      searchAllColliders: true,
+      maxDistance: 32,
+    })
+    while (this.toBeOpaque.length) {
+      const actor = this.toBeOpaque.pop()
+      actor.graphics.opacity = 1
+    }
+    for (const hit of hits) {
+      const isPlayerVisible = hit.collider.owner.hasTag('playerVisible')
+      if (isPlayerVisible) {
+        const actor = hit.collider.owner as Actor
+        actor.graphics.opacity = 0.2
+        this.toBeOpaque.push(actor)
+      }
+    }
   }
 }

@@ -22,8 +22,9 @@ export class Tree extends Actor {
     })
     this.z = 11
     this.graphics.use(sprite)
-    this.collider.useBoxCollider(16, 32, vec(0.5, 0.5))
+    this.collider.useBoxCollider(16, 16, vec(0.5, 0))
     this.addTag('solid')
     this.addTag('tree')
+    this.addTag('playerVisible')
   }
 }
