@@ -6,14 +6,12 @@ import { MovementSystem } from '../systems/movementSystem'
 import { AnimationSystem } from '../systems/animationSystem'
 import { ExploringSystem } from '../systems/exploringSystem'
 import { PlayerControllerSystem } from '../systems/playerControllerSystem'
-import { GlobalEvents } from '../utils/globalEvents'
+import { VisibleBehindObjectsSystem } from '../systems/visibleBehindObjectsSystem'
 
 /**
  * Managed scene
  */
 export class LevelOne extends Scene {
-  protected bus: GlobalEvents = GlobalEvents.getInstance()
-
   public onInitialize() {
     WorldManager.getInstance(this)
     const player = new Player()
@@ -26,6 +24,7 @@ export class LevelOne extends Scene {
     this.world.add(new AnimationSystem())
     this.world.add(new ExploringSystem())
     this.world.add(new PlayerControllerSystem())
+    this.world.add(new VisibleBehindObjectsSystem())
   }
 
   public onActivate() {}
