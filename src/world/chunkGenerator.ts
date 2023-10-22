@@ -12,11 +12,11 @@ export type Chunk = TileMap & ChunkWithPosition
 export class ChunkGenerator {
   private static instance: ChunkGenerator
   private readonly terrainNoise: NoiseFunction2D
-  private readonly treeNoise: NoiseFunction2D
+  private readonly resourceNoise: NoiseFunction2D
 
   constructor() {
     this.terrainNoise = createNoise2D(alea(0x00aaef12))
-    this.treeNoise = createNoise2D(alea(0x00aaef12))
+    this.resourceNoise = createNoise2D(alea(0x00aaef12))
   }
 
   public static getInstance(): ChunkGenerator {
@@ -27,11 +27,15 @@ export class ChunkGenerator {
     return ChunkGenerator.instance
   }
 
-  private setCellType(cell: Tile, tileType: string, treeNoise: number) {
+  private setCellType(cell: Tile, tileType: string, resourceNoise: number) {
     const treeLevelRange = [0.9, 1]
+    const stoneLevelRange = [0.85, 0.9]
     cell.data.set('type', tileType)
-    if (tileType === 'plain' && treeNoise > treeLevelRange[0] && treeNoise < treeLevelRange[1]) {
+    if (tileType === 'plain' && resourceNoise > treeLevelRange[0] && resourceNoise < treeLevelRange[1]) {
       cell.addTag('tree')
+    }
+    if (tileType !== 'water' && resourceNoise > stoneLevelRange[0] && resourceNoise < stoneLevelRange[1]) {
+      cell.addTag('stone')
     }
   }
 
@@ -55,7 +59,7 @@ export class ChunkGenerator {
     for (const cell of chunk.tiles) {
       const { x, y } = cell
       const terrainNoise = this.generateNoise(x, y, chunk.chunkPosition, this.terrainNoise)
-      const treeNoise = this.treeNoise(x, y)
+      const treeNoise = this.resourceNoise(x, y)
       this.setCellType(cell, this.calculateTileType(terrainNoise), treeNoise)
     }
   }

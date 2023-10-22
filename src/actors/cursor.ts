@@ -6,6 +6,7 @@ import { Constants } from '../constants'
 import { Action } from '../types/events/actionEvents'
 import { GlobalEvents } from '../utils/globalEvents'
 import { MovementComponent } from '../components/movementComponent'
+import { GatherableComponent } from '../components/gatherableComponent'
 
 export class Cursor extends Actor {
   protected player: Player
@@ -47,9 +48,11 @@ export class Cursor extends Actor {
       if (action === Action.OnHoldAction) {
         if (this.collisions.length) {
           const target = this.collisions[0]
-          if (target.hasTag('tree')) {
+          const gatherableComponent = target.get<GatherableComponent>(GatherableComponent)
+          if (gatherableComponent) {
+            const type = gatherableComponent.gatherableType
             target.kill()
-            console.log('tree collected')
+            console.log('resource collected', type)
           }
         }
       }

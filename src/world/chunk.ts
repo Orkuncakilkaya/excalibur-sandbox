@@ -1,11 +1,12 @@
-import { Engine, PolygonCollider, TileMap, vec, Vector } from 'excalibur'
+import { Engine, PolygonCollider, Tile, TileMap, vec, Vector } from 'excalibur'
 import { ChunkGenerator, ChunkWithPosition } from './chunkGenerator'
 import { Constants } from '../constants'
-import { Tree } from '../actors/tree'
+import { Tree } from '../actors/resources/tree'
 import { GroundTileType } from '../types/tile/tile'
 import { TinyBattleTileSet } from '../tilesets/tinyBattle/tileSet'
 import { getConditionalSpriteFromTileSet, getSpriteFromTileSet, getTileNeighbours } from '../utils/tile'
 import { TinyTownTileSet } from '../tilesets/tinyTown/tileSet'
+import { Stone } from '../actors/resources/stone'
 
 interface ChunkOptions {
   pos: Vector
@@ -64,10 +65,18 @@ export class Chunk extends TileMap implements ChunkWithPosition {
           }),
         )
       }
-      if (cell.hasTag('tree')) {
-        const tree = new Tree(cell.pos.add(vec(-8, 0)))
-        this.addChild(tree)
-      }
+      this.generateResources(cell)
+    }
+  }
+
+  protected generateResources(cell: Tile) {
+    if (cell.hasTag('tree')) {
+      const tree = new Tree(cell.pos.add(vec(-8, 0)))
+      this.addChild(tree)
+    }
+    if (cell.hasTag('stone')) {
+      const stone = new Stone(cell.pos.add(vec(-8, -8)))
+      this.addChild(stone)
     }
   }
 }

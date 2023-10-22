@@ -1,6 +1,8 @@
 import { Actor, Engine, Sprite, vec, Vector } from 'excalibur'
-import { Resources } from '../resources'
-import { Constants } from '../constants'
+import { Resources } from '../../resources'
+import { Constants } from '../../constants'
+import { GatherableComponent } from '../../components/gatherableComponent'
+import { GatherableTypes } from '../../types/gatherableTypes'
 
 export class Tree extends Actor {
   constructor(pos?: Vector) {
@@ -26,5 +28,6 @@ export class Tree extends Actor {
     this.addTag('solid')
     this.addTag('tree')
     this.addTag('playerVisible')
+    this.addComponent<GatherableComponent>(new GatherableComponent(GatherableTypes.Tree))
   }
 }
