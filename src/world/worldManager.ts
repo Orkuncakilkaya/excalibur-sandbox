@@ -1,11 +1,10 @@
 import { Chunk } from './chunk'
-import { GraphicsComponent, Scene, vec, Vector } from 'excalibur'
+import { Scene, vec, Vector } from 'excalibur'
 import { Constants } from '../constants'
 
 export class WorldManager {
   public static instance: WorldManager
   protected scene: Scene
-  protected chunks: Chunk[] = []
 
   private constructor(scene: Scene) {
     this.scene = scene
@@ -22,44 +21,49 @@ export class WorldManager {
   }
 
   public createChunk(position: Vector) {
-    const chunk = new Chunk({
-      pos: position,
-    })
+    let chunk = this.scene.tileMaps.find((t) => t.active === false) as Chunk
+    if (!chunk) {
+      chunk = new Chunk({
+        pos: position,
+      })
+    }
+    chunk.chunkPosition = position
     chunk.pos = vec(
       Constants.ChunkSize * Constants.TileSize * position.x,
       Constants.ChunkSize * Constants.TileSize * position.y,
     )
-    return this.addChunk(chunk)
-  }
+    chunk.generateTiles()
 
-  protected addChunk(chunk: Chunk) {
-    this.chunks.push(chunk)
     this.scene.add(chunk)
+
     return chunk
   }
 
   public findOrCreateChunk(vector: Vector) {
-    const target = this.chunks.find((t) => t.chunkPosition.x === vector.x && t.chunkPosition.y === vector.y)
+    const target = this.scene.tileMaps.find(
+      (t: Chunk) => t.chunkPosition.x === vector.x && t.chunkPosition.y === vector.y,
+    )
 
     return target ?? this.createChunk(vector)
   }
 
   public setChunkVisible(vector: Vector) {
-    this.chunks.forEach((chunk) => {
-      const graphics = chunk.get<GraphicsComponent>(GraphicsComponent)
-      graphics.visible = false
-    })
-    const target = this.findOrCreateChunk(vector)
+    const target = this.findOrCreateChunk(vector) as Chunk
     const vectors = this.getChunkNeighbours(target.chunkPosition).map((neighbour) => {
       this.findOrCreateChunk(neighbour)
       return neighbour
     })
     vectors.push(vector)
+
+    this.scene.tileMaps.forEach((chunk: Chunk) => {
+      if (!vectors.includes(chunk.chunkPosition)) {
+        chunk.active = false
+      }
+    })
     for (const vect of vectors) {
-      this.chunks.forEach((chunk) => {
+      this.scene.tileMaps.forEach((chunk: Chunk) => {
         if (chunk.chunkPosition.x === vect.x && chunk.chunkPosition.y === vect.y) {
-          const graphics = chunk.get<GraphicsComponent>(GraphicsComponent)
-          graphics.visible = true
+          chunk.active = true
         }
       })
     }

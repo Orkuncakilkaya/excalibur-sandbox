@@ -9,7 +9,6 @@ import {
   Entity,
   Gamepad,
   Keys,
-  PointerButton,
   Scene,
   System,
   SystemType,

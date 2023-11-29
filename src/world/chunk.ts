@@ -13,7 +13,7 @@ interface ChunkOptions {
 }
 
 export class Chunk extends TileMap implements ChunkWithPosition {
-  public readonly chunkPosition: Vector
+  public chunkPosition: Vector
 
   constructor(options: ChunkOptions) {
     super({
@@ -27,10 +27,9 @@ export class Chunk extends TileMap implements ChunkWithPosition {
 
   onInitialize(_engine: Engine) {
     super.onInitialize(_engine)
-    this.generateTiles()
   }
 
-  protected generateTiles() {
+  generateTiles() {
     const generator = ChunkGenerator.getInstance()
     generator.generateChunk(this)
     for (const cell of this.tiles) {
