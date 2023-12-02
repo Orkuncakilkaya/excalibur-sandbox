@@ -1,6 +1,8 @@
 const path = require('path')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebPackPlugin = require('html-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin')
+const { sveltePreprocess } = require('svelte-preprocess/dist/autoProcess')
 
 module.exports = {
   entry: './src/index.ts',
@@ -28,10 +30,34 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
+      {
+        test: /\.(svelte)$/,
+        use: {
+          loader: 'svelte-loader',
+          options: {
+            preprocess: sveltePreprocess(),
+          },
+        },
+      },
+      {
+        test: /node_modules\/svelte\/.*\.mjs$/,
+        resolve: {
+          fullySpecified: false,
+        },
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.js', '.svelte'],
+    alias: {
+      svelte: path.resolve('node_modules', 'svelte/src/runtime'),
+    },
+    mainFields: ['svelte', 'browser', 'module', 'main'],
+    conditionNames: ['svelte', 'browser', 'import'],
   },
   optimization: {
     splitChunks: {
@@ -40,8 +66,13 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(),
+    new CopyPlugin({
+      patterns: [{ from: './assets/style.css', to: 'style.css' }],
+    }),
     new HtmlWebPackPlugin({
       title: 'Excalibur Webpack Sample',
+      template: './assets/index.html',
+      hash: true,
     }),
   ],
 }

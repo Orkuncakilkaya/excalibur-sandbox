@@ -7,6 +7,7 @@ import { AnimationSystem } from '../systems/animationSystem'
 import { ExploringSystem } from '../systems/exploringSystem'
 import { PlayerControllerSystem } from '../systems/playerControllerSystem'
 import { VisibleBehindObjectsSystem } from '../systems/visibleBehindObjectsSystem'
+import { GameScreen, uiStateChanged } from '../ui/events/uistate'
 
 /**
  * Managed scene
@@ -25,6 +26,7 @@ export class LevelOne extends Scene {
     this.world.add(new ExploringSystem())
     this.world.add(new PlayerControllerSystem())
     this.world.add(new VisibleBehindObjectsSystem())
+    uiStateChanged({ screen: GameScreen.HUD })
   }
 
   public onActivate() {}

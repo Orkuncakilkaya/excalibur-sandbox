@@ -24,6 +24,7 @@ import { MovementComponent } from '../components/movementComponent'
 import { Constants } from '../constants'
 import { globalPositionToChunkPosition, vectorToDirection } from '../utils/position'
 import { WorldManager } from '../world/worldManager'
+import { GameScreen, listenUIStateUpdated } from '../ui/events/uistate'
 
 export class PlayerControllerSystem extends System {
   readonly systemType: SystemType = SystemType.Update
@@ -31,13 +32,20 @@ export class PlayerControllerSystem extends System {
   private gamePad?: Gamepad
   private bus: GlobalEvents = GlobalEvents.getInstance()
   private input!: EngineInput
+  private isPaused: boolean = false
 
   initialize(scene: Scene) {
     this.input = scene.engine.input
     this.prepareGamepad()
+    listenUIStateUpdated((event) => {
+      this.isPaused = event.detail.screen !== GameScreen.HUD
+    })
   }
 
   update(entities: Entity[]): void {
+    if (this.isPaused) {
+      return
+    }
     const world = WorldManager.getInstance()
     for (const entity of entities) {
       const component = entity.get<PlayerControllerComponent>(PlayerControllerComponent)

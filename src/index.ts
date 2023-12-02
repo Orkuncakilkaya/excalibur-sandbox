@@ -2,12 +2,13 @@ import { Engine, DisplayMode } from 'excalibur'
 import { LevelOne } from './scenes/levelOne'
 import { Resources } from './resources'
 import { Loader } from './loader'
+import App from './ui/App.svelte'
 
 /**
  * Managed game class
  */
 class Game extends Engine {
-  private levelOne: LevelOne
+  private levelOne!: LevelOne
 
   constructor() {
     super({
@@ -35,3 +36,5 @@ const game = new Game()
 game.start().then(() => {
   game.goToScene('levelOne')
 })
+
+new App({ target: document.getElementById('ui') })
