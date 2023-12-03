@@ -53,9 +53,6 @@
 <div class="ui">
     {#if onHUD}
         <div class="hud">
-            <button type="button" on:click={onPauseClicked}>
-                Pause
-            </button>
         </div>
     {:else if onPause}
         <div class="pause">

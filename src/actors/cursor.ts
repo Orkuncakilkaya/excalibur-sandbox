@@ -7,6 +7,8 @@ import { Action } from '../types/events/actionEvents'
 import { GlobalEvents } from '../utils/globalEvents'
 import { MovementComponent } from '../components/movementComponent'
 import { GatherableComponent } from '../components/gatherableComponent'
+import { Serializer } from '../utils/serializer'
+import { CellComponent } from '../components/cellComponent'
 
 export class Cursor extends Actor {
   protected player: Player
@@ -49,10 +51,11 @@ export class Cursor extends Actor {
         if (this.collisions.length) {
           const target = this.collisions[0]
           const gatherableComponent = target.get<GatherableComponent>(GatherableComponent)
-          if (gatherableComponent) {
-            const type = gatherableComponent.gatherableType
+          const cellComponent = target.get<CellComponent>(CellComponent)
+          if (gatherableComponent && cellComponent) {
+            // const type = gatherableComponent.gatherableType
+            Serializer.getInstance().removeResourceFromWorld(cellComponent.cell)
             target.kill()
-            console.log('resource collected', type)
           }
         }
       }

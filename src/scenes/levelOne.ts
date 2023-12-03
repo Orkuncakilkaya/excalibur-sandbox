@@ -1,4 +1,4 @@
-import { Scene } from 'excalibur'
+import { Scene, Timer } from 'excalibur'
 import { WorldManager } from '../world/worldManager'
 import { Player } from '../actors/player'
 import { Cursor } from '../actors/cursor'
@@ -7,13 +7,15 @@ import { AnimationSystem } from '../systems/animationSystem'
 import { ExploringSystem } from '../systems/exploringSystem'
 import { PlayerControllerSystem } from '../systems/playerControllerSystem'
 import { VisibleBehindObjectsSystem } from '../systems/visibleBehindObjectsSystem'
-import { GameScreen, uiStateChanged } from '../ui/events/uistate'
+import { GameScreen, listenUIStateUpdated, uiStateChanged } from '../ui/events/uistate'
+import { Serializer } from '../utils/serializer'
 
 /**
  * Managed scene
  */
 export class LevelOne extends Scene {
   public onInitialize() {
+    Serializer.getInstance()
     WorldManager.getInstance(this)
     const player = new Player()
     this.add(player)
@@ -27,9 +29,27 @@ export class LevelOne extends Scene {
     this.world.add(new PlayerControllerSystem())
     this.world.add(new VisibleBehindObjectsSystem())
     uiStateChanged({ screen: GameScreen.HUD })
+    listenUIStateUpdated((event) => {
+      if (event.detail.screen === GameScreen.Pause) {
+        this.engine.stop()
+      } else if (event.detail.screen === GameScreen.HUD) {
+        this.engine.start()
+      }
+    })
+    const saveTimer = new Timer({
+      interval: 2000,
+      fcn: () => {
+        Serializer.getInstance().save()
+      },
+      repeats: true,
+    })
+    this.add(saveTimer)
+    saveTimer.start()
   }
 
   public onActivate() {}
 
-  public onDeactivate() {}
+  public onDeactivate() {
+    Serializer.getInstance().save()
+  }
 }

@@ -7,6 +7,8 @@ import { TinyBattleTileSet } from '../tilesets/tinyBattle/tileSet'
 import { getConditionalSpriteFromTileSet, getSpriteFromTileSet, getTileNeighbours } from '../utils/tile'
 import { TinyTownTileSet } from '../tilesets/tinyTown/tileSet'
 import { Stone } from '../actors/resources/stone'
+import { Serializer } from '../utils/serializer'
+import { CellComponent } from '../components/cellComponent'
 
 interface ChunkOptions {
   pos: Vector
@@ -14,6 +16,7 @@ interface ChunkOptions {
 
 export class Chunk extends TileMap implements ChunkWithPosition {
   public chunkPosition: Vector
+  private removedResources: { x: number; y: number }[] = []
 
   constructor(options: ChunkOptions) {
     super({
@@ -23,6 +26,7 @@ export class Chunk extends TileMap implements ChunkWithPosition {
       tileWidth: Constants.TileSize,
     })
     this.chunkPosition = options.pos
+    this.removedResources = Serializer.getInstance().getRemovedResources(this.chunkPosition.x, this.chunkPosition.y)
   }
 
   onInitialize(_engine: Engine) {
@@ -69,12 +73,18 @@ export class Chunk extends TileMap implements ChunkWithPosition {
   }
 
   protected generateResources(cell: Tile) {
+    const isRemoved = this.removedResources.find((t) => t.x === cell.x && t.y === cell.y)
+    if (isRemoved) {
+      return
+    }
     if (cell.hasTag('tree')) {
       const tree = new Tree(cell.pos.add(vec(-8, 0)))
+      tree.addComponent(new CellComponent(cell))
       this.addChild(tree)
     }
     if (cell.hasTag('stone')) {
       const stone = new Stone(cell.pos.add(vec(-8, -8)))
+      stone.addComponent(new CellComponent(cell))
       this.addChild(stone)
     }
   }
