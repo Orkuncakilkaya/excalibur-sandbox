@@ -7,7 +7,7 @@ import { AnimationSystem } from '../systems/animationSystem'
 import { ExploringSystem } from '../systems/exploringSystem'
 import { PlayerControllerSystem } from '../systems/playerControllerSystem'
 import { VisibleBehindObjectsSystem } from '../systems/visibleBehindObjectsSystem'
-import { GameScreen, listenUIStateUpdated, uiStateChanged } from '../ui/events/uistate'
+import { GameScreen, onUIStateChanged, dispatchUIState } from '../ui/events/uiState'
 import { Serializer } from '../utils/serializer'
 
 /**
@@ -28,8 +28,8 @@ export class LevelOne extends Scene {
     this.world.add(new ExploringSystem())
     this.world.add(new PlayerControllerSystem())
     this.world.add(new VisibleBehindObjectsSystem())
-    uiStateChanged({ screen: GameScreen.HUD })
-    listenUIStateUpdated((event) => {
+    dispatchUIState({ screen: GameScreen.HUD })
+    onUIStateChanged((event) => {
       if (event.detail.screen === GameScreen.Pause) {
         this.engine.stop()
       } else if (event.detail.screen === GameScreen.HUD) {

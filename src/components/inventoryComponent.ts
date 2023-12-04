@@ -1,5 +1,6 @@
 import { Component } from 'excalibur'
 import { ItemComponent } from './itemComponent'
+import { dispatchInventoryState } from '../ui/events/inventoryState'
 
 type NewInventoryOptions = {
   maxWeight: number
@@ -18,6 +19,10 @@ export class InventoryComponent extends Component {
     this.maxWeight = maxWeight
     this.container = container
     this.weight = weight
+    const timeout = setTimeout(() => {
+      dispatchInventoryState({ maxWeight, weight, container })
+      clearTimeout(timeout)
+    })
   }
 
   canPushItem(item: ItemComponent) {
@@ -42,5 +47,11 @@ export class InventoryComponent extends Component {
         this.container.push(item)
       }
     }
+    this.weight = this.container.reduce((acc, item) => acc + item.stack * item.weight, 0)
+    dispatchInventoryState({
+      container: this.container,
+      weight: this.weight,
+      maxWeight: this.maxWeight,
+    })
   }
 }

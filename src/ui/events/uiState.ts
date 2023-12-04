@@ -9,8 +9,8 @@ export type UIStateUpdatedEvent = {
   screen: GameScreen
 }
 
-export const uiStateChanged = (detail: UIStateUpdatedEvent) =>
+export const dispatchUIState = (detail: UIStateUpdatedEvent) =>
   dispatchEvent(new CustomEvent<UIStateUpdatedEvent>('UIStateUpdated', { detail }))
 
-export const listenUIStateUpdated = (listener: (event: CustomEvent<UIStateUpdatedEvent>) => void) =>
+export const onUIStateChanged = (listener: (event: CustomEvent<UIStateUpdatedEvent>) => void) =>
   window.addEventListener('UIStateUpdated', listener)

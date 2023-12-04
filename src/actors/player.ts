@@ -54,7 +54,7 @@ export class Player extends Actor {
       }),
     )
     const { weight, container } = Serializer.getInstance().getPlayerInventory()
-    this.addComponent<InventoryComponent>(new InventoryComponent({ weight, container, maxWeight: 500 }))
+    this.addComponent<InventoryComponent>(new InventoryComponent({ weight, container, maxWeight: 28 }))
   }
 
   protected createBodyAnimation(frameIndices: number[]) {

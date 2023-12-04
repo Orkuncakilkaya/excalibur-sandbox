@@ -1,21 +1,22 @@
 <script lang="ts">
     import {gameScreen} from "./store/ui";
     import {Keys} from "excalibur";
-    import {GameScreen, listenUIStateUpdated, uiStateChanged} from "./events/uistate";
+    import {GameScreen, onUIStateChanged, dispatchUIState} from "./events/uiState";
+    import InventoryFrame from "./components/InventoryFrame.svelte";
 
     let currentGameScreen = GameScreen.Loading;
 
     gameScreen.subscribe(screen => currentGameScreen = screen);
 
-    listenUIStateUpdated(function (event) {
+    onUIStateChanged(function (event) {
         gameScreen.set(event.detail.screen)
     })
 
     function onPauseClicked() {
         if (currentGameScreen === GameScreen.HUD) {
-            uiStateChanged({screen: GameScreen.Pause})
+            dispatchUIState({screen: GameScreen.Pause})
         } else if(currentGameScreen === GameScreen.Pause) {
-            uiStateChanged({screen: GameScreen.HUD})
+            dispatchUIState({screen: GameScreen.HUD})
         }
     }
 
@@ -53,6 +54,7 @@
 <div class="ui">
     {#if onHUD}
         <div class="hud">
+            <InventoryFrame />
         </div>
     {:else if onPause}
         <div class="pause">

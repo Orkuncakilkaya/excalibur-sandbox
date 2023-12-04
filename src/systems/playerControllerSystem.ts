@@ -24,7 +24,7 @@ import { MovementComponent } from '../components/movementComponent'
 import { Constants } from '../constants'
 import { globalPositionToChunkPosition, vectorToDirection } from '../utils/position'
 import { WorldManager } from '../world/worldManager'
-import { GameScreen, listenUIStateUpdated } from '../ui/events/uistate'
+import { GameScreen, onUIStateChanged } from '../ui/events/uiState'
 
 export class PlayerControllerSystem extends System {
   readonly systemType: SystemType = SystemType.Update
@@ -37,7 +37,7 @@ export class PlayerControllerSystem extends System {
   initialize(scene: Scene) {
     this.input = scene.engine.input
     this.prepareGamepad()
-    listenUIStateUpdated((event) => {
+    onUIStateChanged((event) => {
       this.isPaused = event.detail.screen !== GameScreen.HUD
     })
   }
