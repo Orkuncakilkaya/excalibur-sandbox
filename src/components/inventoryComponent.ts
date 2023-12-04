@@ -1,6 +1,8 @@
 import { Component } from 'excalibur'
 import { ItemComponent } from './itemComponent'
 import { dispatchInventoryState } from '../ui/events/inventoryState'
+import { Items, Recipes } from '../resources'
+import { onCraft } from '../ui/events/craftState'
 
 type NewInventoryOptions = {
   maxWeight: number
@@ -23,6 +25,10 @@ export class InventoryComponent extends Component {
       dispatchInventoryState({ maxWeight, weight, container })
       clearTimeout(timeout)
     })
+
+    onCraft((event) => {
+      this.craft(Items[event.detail.item])
+    })
   }
 
   canPushItem(item: ItemComponent) {
@@ -32,6 +38,62 @@ export class InventoryComponent extends Component {
   canPushAllItems(items: ItemComponent[]) {
     const weight = items.reduce((acc, item) => acc + item.weight * item.stack, 0)
     return weight <= this.maxWeight - this.weight
+  }
+
+  canCraft(item: ItemComponent) {
+    console.log(item)
+    if (item.name in Recipes) {
+      const container = JSON.parse(JSON.stringify(this.container)) as ItemComponent[]
+      const recipe = Recipes[item.name]
+      return recipe.every((recipeItem) => {
+        return (
+          container.filter((t) => t.name === recipeItem.name).reduce((acc, item) => acc + item.stack, 0) >=
+          recipeItem.stack
+        )
+      })
+    }
+
+    return false
+  }
+
+  removeRecipeItems(item: ItemComponent) {
+    if (item.name in Recipes) {
+      const recipe = Recipes[item.name]
+      recipe.forEach((recipeItem) => {
+        this.removeItems(recipeItem.name, recipeItem.stack)
+      })
+    }
+  }
+
+  removeItems(name: string, stack: number) {
+    const container = JSON.parse(JSON.stringify(this.container)) as ItemComponent[]
+    let remaining = stack
+    for (let i = container.length - 1; i >= 0; i--) {
+      if (container[i].name === name) {
+        const remove = Math.min(container[i].stack, remaining)
+        container[i].stack -= remove
+        remaining -= remove
+
+        // Remove the item if the stack is 0 or less
+        if (container[i].stack <= 0) {
+          container.splice(i, 1)
+        }
+
+        // Stop if we have removed the required quantity
+        if (remaining <= 0) {
+          break
+        }
+      }
+    }
+
+    this.container = container
+  }
+
+  craft(item: ItemComponent) {
+    if (this.canCraft(item)) {
+      this.removeRecipeItems(item)
+      this.pushItem(item)
+    }
   }
 
   pushItem(item: ItemComponent) {

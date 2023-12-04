@@ -3,6 +3,7 @@
     import {Keys} from "excalibur";
     import {GameScreen, onUIStateChanged, dispatchUIState} from "./events/uiState";
     import InventoryFrame from "./components/InventoryFrame.svelte";
+    import CraftingFrame from "./components/CraftingFrame.svelte";
 
     let currentGameScreen = GameScreen.Loading;
 
@@ -55,6 +56,7 @@
     {#if onHUD}
         <div class="hud">
             <InventoryFrame />
+            <CraftingFrame />
         </div>
     {:else if onPause}
         <div class="pause">

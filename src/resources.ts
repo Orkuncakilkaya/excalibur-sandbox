@@ -26,7 +26,7 @@ const Items = {
   stone: new ItemComponent({
     name: 'stone',
     label: 'Stone',
-    maxStackCount: 2,
+    maxStackCount: 5,
     maxDurability: 1,
     weight: 1,
     isStackable: true,
@@ -39,7 +39,7 @@ const Items = {
   wood: new ItemComponent({
     name: 'wood',
     label: 'Wood',
-    maxStackCount: 2,
+    maxStackCount: 5,
     maxDurability: 1,
     weight: 1,
     isStackable: true,
@@ -49,6 +49,43 @@ const Items = {
     hasDurability: false,
     isConsumable: false,
   }),
+  stoneAxe: new ItemComponent({
+    name: 'stoneAxe',
+    label: 'Stone Axe',
+    weight: 1,
+    durability: 100,
+    stack: 1,
+    hasDurability: true,
+    isEquipment: true,
+    isConsumable: false,
+    isStackable: false,
+    maxDurability: 100,
+    maxStackCount: 1,
+  }),
+  stonePickaxe: new ItemComponent({
+    name: 'stonePickaxe',
+    label: 'Stone Pickaxe',
+    weight: 1,
+    durability: 100,
+    stack: 1,
+    hasDurability: true,
+    isEquipment: true,
+    isConsumable: false,
+    isStackable: false,
+    maxDurability: 100,
+    maxStackCount: 1,
+  }),
 }
 
-export { Resources, Items }
+const Recipes: { [key: string]: { name: string; stack: number }[] } = {
+  stoneAxe: [
+    { name: 'wood', stack: 2 },
+    { name: 'stone', stack: 2 },
+  ],
+  stonePickaxe: [
+    { name: 'wood', stack: 2 },
+    { name: 'stone', stack: 3 },
+  ],
+}
+
+export { Resources, Items, Recipes }

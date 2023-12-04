@@ -25,6 +25,8 @@
     .item {
         background: #fff;
         height: 32px;
+        border: 0;
+        outline: 0;
     }
 </style>
 
