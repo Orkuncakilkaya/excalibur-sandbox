@@ -1,5 +1,11 @@
 import { Tile } from 'excalibur'
 import { globalPositionToChunkPosition } from './position'
+import { InventoryComponent } from '../components/inventoryComponent'
+import { Items } from '../resources'
+import { ItemComponent } from '../components/itemComponent'
+import { WorldManager } from '../world/worldManager'
+import { PlayerControllerComponent } from '../components/playerControllerComponent'
+import { Player } from '../actors/player'
 
 type SerializableVector = {
   x: number
@@ -8,17 +14,31 @@ type SerializableVector = {
 
 type ChunksGenerated = SerializableVector[]
 type RemovedResourcesByChunk = { [key: string]: SerializableVector[] }
+type SerializableItem = {
+  name: string
+  stack: number
+  durability: number
+}
+
+type SerializableInventory = {
+  container: SerializableItem[]
+}
 
 export class Serializer {
   private static instance: Serializer
   private chunksGenerated: ChunksGenerated = []
   private removedResourcesByChunk: RemovedResourcesByChunk = {}
+  private playerInventory: SerializableInventory
+
   private constructor() {
     this.chunksGenerated = JSON.parse(localStorage.getItem('@game/chunksGenerated') ?? '[]') as ChunksGenerated
     this.chunksGenerated.map((vector) => {
       const id = this.getChunkId(vector.x, vector.y)
       this.removedResourcesByChunk[id] = JSON.parse(localStorage.getItem(`@game/removedResources/${id}`) ?? '[]')
     })
+    this.playerInventory = JSON.parse(
+      localStorage.getItem('@game/playerInventory') ?? '{"container": []}',
+    ) as SerializableInventory
   }
 
   public static getInstance() {
@@ -49,10 +69,37 @@ export class Serializer {
     return this.removedResourcesByChunk[this.getChunkId(x, y)] ?? []
   }
 
+  getPlayerInventory() {
+    const container: ItemComponent[] = this.playerInventory.container.map((serialized) => {
+      const item = Items[serialized.name] as ItemComponent
+      return new ItemComponent({
+        ...item,
+        stack: serialized.stack,
+        durability: serialized.durability,
+      })
+    })
+    const weight = container.reduce((acc, item) => acc + item.weight * item.stack, 0)
+    return { weight, container }
+  }
+
   save() {
     localStorage.setItem('@game/chunksGenerated', JSON.stringify(this.chunksGenerated))
     Object.keys(this.removedResourcesByChunk).forEach((id) => {
       localStorage.setItem(`@game/removedResources/${id}`, JSON.stringify(this.removedResourcesByChunk[id]))
     })
+    const player = WorldManager.getInstance()
+      .getScene()
+      .actors.find((t) => t.get<PlayerControllerComponent>(PlayerControllerComponent)) as Player
+    if (player) {
+      const inventory = player.get<InventoryComponent>(InventoryComponent)
+      const container: SerializableItem[] = inventory.container.map((item) => {
+        return {
+          name: item.name,
+          durability: item.durability,
+          stack: item.stack,
+        }
+      })
+      localStorage.setItem('@game/playerInventory', JSON.stringify({ container }))
+    }
   }
 }

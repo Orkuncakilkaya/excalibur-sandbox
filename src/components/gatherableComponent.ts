@@ -1,12 +1,12 @@
 import { Component } from 'excalibur'
-import { GatherableTypes } from '../types/gatherableTypes'
+import { ItemComponent } from './itemComponent'
 
 export class GatherableComponent extends Component {
   readonly type: string = 'resource'
-  gatherableType: GatherableTypes
+  items: ItemComponent[] = []
 
-  constructor(gatherableType: GatherableTypes) {
+  constructor(items: ItemComponent[]) {
     super()
-    this.gatherableType = gatherableType
+    this.items = items
   }
 }

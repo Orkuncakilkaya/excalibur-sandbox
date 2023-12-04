@@ -69,6 +69,10 @@ export class WorldManager {
     }
   }
 
+  public getScene() {
+    return this.scene
+  }
+
   protected getChunkNeighbours(vector: Vector) {
     const east = vec(vector.x + 1, vector.y)
     const west = vec(vector.x - 1, vector.y)

@@ -8,6 +8,8 @@ import { SpriteComponent } from '../components/spriteComponent'
 import { Resources } from '../resources'
 import { Constants } from '../constants'
 import { VisibleBehindObjectsComponent } from '../components/visibleBehindObjectsComponent'
+import { InventoryComponent } from '../components/inventoryComponent'
+import { Serializer } from '../utils/serializer'
 
 export class Player extends Actor {
   onInitialize(_engine: Engine) {
@@ -51,6 +53,8 @@ export class Player extends Actor {
         },
       }),
     )
+    const { weight, container } = Serializer.getInstance().getPlayerInventory()
+    this.addComponent<InventoryComponent>(new InventoryComponent({ weight, container, maxWeight: 500 }))
   }
 
   protected createBodyAnimation(frameIndices: number[]) {

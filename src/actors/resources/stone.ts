@@ -1,8 +1,7 @@
 import { Actor, Engine, Sprite, Vector } from 'excalibur'
-import { Resources } from '../../resources'
+import { Items, Resources } from '../../resources'
 import { Constants } from '../../constants'
 import { GatherableComponent } from '../../components/gatherableComponent'
-import { GatherableTypes } from '../../types/gatherableTypes'
 
 export class Stone extends Actor {
   constructor(pos?: Vector) {
@@ -28,6 +27,6 @@ export class Stone extends Actor {
     this.collider.useBoxCollider(16, 16)
     this.addTag('solid')
     this.addTag('stone')
-    this.addComponent<GatherableComponent>(new GatherableComponent(GatherableTypes.Stone))
+    this.addComponent<GatherableComponent>(new GatherableComponent([Items.stone]))
   }
 }

@@ -9,6 +9,8 @@ import { MovementComponent } from '../components/movementComponent'
 import { GatherableComponent } from '../components/gatherableComponent'
 import { Serializer } from '../utils/serializer'
 import { CellComponent } from '../components/cellComponent'
+import { InventoryComponent } from '../components/inventoryComponent'
+import { ItemComponent } from '../components/itemComponent'
 
 export class Cursor extends Actor {
   protected player: Player
@@ -52,8 +54,14 @@ export class Cursor extends Actor {
           const target = this.collisions[0]
           const gatherableComponent = target.get<GatherableComponent>(GatherableComponent)
           const cellComponent = target.get<CellComponent>(CellComponent)
-          if (gatherableComponent && cellComponent) {
-            // const type = gatherableComponent.gatherableType
+          const inventory = this.player.get<InventoryComponent>(InventoryComponent)
+          if (gatherableComponent && cellComponent && inventory) {
+            const items = JSON.parse(JSON.stringify(gatherableComponent.items)) as ItemComponent[] // FIXME: I hate this
+            if (inventory.canPushAllItems(items)) {
+              items.forEach((item) => {
+                inventory.pushItem(item)
+              })
+            }
             Serializer.getInstance().removeResourceFromWorld(cellComponent.cell)
             target.kill()
           }
